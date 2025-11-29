@@ -1,4 +1,4 @@
-import { supabase } from './supabase';
+import { getSupabaseClient } from './supabase';
 import type { Product } from './supabase';
 
 // Реэкспортируем тип для удобства
@@ -14,12 +14,16 @@ export async function saveProducts(products: Product[], searchQuery: string): Pr
     }));
 
     // Используем upsert для обновления существующих продуктов
-    const { error } = await supabase
-      .from('products')
-      .upsert(productsToInsert, {
-        onConflict: 'link,store', // Обновляем по уникальной комбинации link и store
-        ignoreDuplicates: false
-      });
+     const supabase = getSupabaseClient();
+     if (!supabase) {
+       return { success: false, error: 'Supabase client not initialized' };
+     }
+     const { error } = await supabase
+       .from('products')
+       .upsert(productsToInsert, {
+         onConflict: 'link,store', // Обновляем по уникальной комбинации link и store
+         ignoreDuplicates: false
+       });
 
     if (error) {
       console.error('Ошибка при сохранении продуктов:', error);
@@ -40,17 +44,22 @@ export async function saveProducts(products: Product[], searchQuery: string): Pr
 // Функция для получения продуктов по поисковому запросу
 export async function getProductsByQuery(searchQuery: string, store?: string): Promise<{ products: Product[]; error?: string }> {
   try {
-    let query = supabase
-      .from('products')
-      .select('*')
-      .eq('search_query', searchQuery)
-      .order('created_at', { ascending: false });
+    const supabase = getSupabaseClient();
+     if (!supabase) {
+       return { products: [], error: 'Supabase client not initialized' };
+     }
+     
+     let query = supabase
+       .from('products')
+       .select('*')
+       .eq('search_query', searchQuery)
+       .order('created_at', { ascending: false });
 
-    if (store) {
-      query = query.eq('store', store);
-    }
+     if (store) {
+       query = query.eq('store', store);
+     }
 
-    const { data, error } = await query;
+     const { data, error } = await query;
 
     if (error) {
       console.error('Ошибка при получении продуктов:', error);
@@ -73,17 +82,22 @@ export async function getAllProducts(page: number = 1, limit: number = 50, store
     const from = (page - 1) * limit;
     const to = from + limit - 1;
 
-    let query = supabase
-      .from('products')
-      .select('*', { count: 'exact' })
-      .order('created_at', { ascending: false })
-      .range(from, to);
+    const supabase = getSupabaseClient();
+     if (!supabase) {
+       return { products: [], total: 0, error: 'Supabase client not initialized' };
+     }
+     
+     let query = supabase
+       .from('products')
+       .select('*', { count: 'exact' })
+       .order('created_at', { ascending: false })
+       .range(from, to);
 
-    if (store) {
-      query = query.eq('store', store);
-    }
+     if (store) {
+       query = query.eq('store', store);
+     }
 
-    const { data, error, count } = await query;
+     const { data, error, count } = await query;
 
     if (error) {
       console.error('Ошибка при получении продуктов:', error);
@@ -104,18 +118,23 @@ export async function getAllProducts(page: number = 1, limit: number = 50, store
 // Функция для поиска продуктов по названию
 export async function searchProducts(query: string, store?: string): Promise<{ products: Product[]; error?: string }> {
   try {
-    let supabaseQuery = supabase
-      .from('products')
-      .select('*')
-      .ilike('title', `%${query}%`)
-      .order('created_at', { ascending: false })
-      .limit(100);
+    const supabase = getSupabaseClient();
+     if (!supabase) {
+       return { products: [], error: 'Supabase client not initialized' };
+     }
+     
+     let supabaseQuery = supabase
+       .from('products')
+       .select('*')
+       .ilike('title', `%${query}%`)
+       .order('created_at', { ascending: false })
+       .limit(100);
 
-    if (store) {
-      supabaseQuery = supabaseQuery.eq('store', store);
-    }
+     if (store) {
+       supabaseQuery = supabaseQuery.eq('store', store);
+     }
 
-    const { data, error } = await supabaseQuery;
+     const { data, error } = await supabaseQuery;
 
     if (error) {
       console.error('Ошибка при поиске продуктов:', error);
@@ -138,10 +157,15 @@ export async function cleanupOldProducts(): Promise<{ success: boolean; error?: 
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    const { error } = await supabase
-      .from('products')
-      .delete()
-      .lt('created_at', thirtyDaysAgo.toISOString());
+    const supabase = getSupabaseClient();
+     if (!supabase) {
+       return { success: false, error: 'Supabase client not initialized' };
+     }
+     
+     const { error } = await supabase
+       .from('products')
+       .delete()
+       .lt('created_at', thirtyDaysAgo.toISOString());
 
     if (error) {
       console.error('Ошибка при очистке старых продуктов:', error);

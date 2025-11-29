@@ -1,19 +1,28 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+// Create a function to initialize Supabase client
+let supabaseClient: SupabaseClient | null = null;
 
-// Check if environment variables are set
-if (!supabaseUrl) {
-  console.error('Missing SUPABASE_URL in environment variables');
-}
-if (!supabaseAnonKey) {
-  console.error('Missing NEXT_PUBLIC_SUPABASE_ANON_KEY in environment variables');
-}
+export const getSupabaseClient = () => {
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-export const supabase = supabaseUrl && supabaseAnonKey
-  ? createClient(supabaseUrl, supabaseAnonKey)
-  : null;
+  // Check if environment variables are set
+  if (!supabaseUrl) {
+    console.error('Missing SUPABASE_URL in environment variables');
+  }
+  if (!supabaseAnonKey) {
+    console.error('Missing NEXT_PUBLIC_SUPABASE_ANON_KEY in environment variables');
+  }
+
+  if (!supabaseClient && supabaseUrl && supabaseAnonKey) {
+    supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
+  }
+  return supabaseClient;
+};
+
+// Export supabase as null initially to avoid module evaluation issues
+export const supabase = null;
 
 // Типы для базы данных
 export interface Product {
@@ -24,7 +33,7 @@ export interface Product {
   discount?: string;
   link: string;
  image?: string;
- availability?: string;
+  availability?: string;
   rating?: string;
   store: string;
   search_query: string;
@@ -56,8 +65,12 @@ export type SupabaseClientType = SupabaseClient<Database>;
 
 // Create a server-side Supabase client
 export const createServerSupabase = () => {
-  if (!supabaseUrl || !supabaseAnonKey) {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  
+  if (!url || !key) {
+    console.error('Missing Supabase environment variables');
     throw new Error('Missing Supabase environment variables');
   }
- return createClient(supabaseUrl, supabaseAnonKey);
+  return createClient(url, key);
 };

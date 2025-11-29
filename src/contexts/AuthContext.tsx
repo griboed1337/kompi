@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { Session, User, SupabaseClient } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabase';
+import { getSupabaseClient } from '@/lib/supabase';
 
 interface AuthContextType {
   user: User | null;
@@ -22,112 +22,129 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
- useEffect(() => {
-    if (!supabase) {
-      console.error('Supabase client not initialized. Check your environment variables.');
-      setLoading(false);
-      return;
-    }
+  useEffect(() => {
+     // Only initialize Supabase client on the client side
+     if (typeof window === 'undefined') {
+       setLoading(false);
+       return;
+     }
 
-    // Get initial session
-    const getInitialSession = async () => {
-      const { data: { session } } = await supabase!.auth.getSession();
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
+     const supabase = getSupabaseClient();
+     if (!supabase) {
+       console.error('Supabase client not initialized. Check your environment variables.');
+       setLoading(false);
+       return;
+     }
 
-      // Listen for auth changes
-      const { data: { subscription } } = await supabase!.auth.onAuthStateChange(
-        (_event: string, session: Session | null) => {
-          setSession(session);
-          setUser(session?.user ?? null);
-          setLoading(false);
-        }
-      );
+     // Get initial session
+     const getInitialSession = async () => {
+       const { data: { session } } = await supabase.auth.getSession();
+       setSession(session);
+       setUser(session?.user ?? null);
+       setLoading(false);
 
-      return () => {
-        subscription.unsubscribe();
-      };
-    };
+       // Listen for auth changes
+       const { data: { subscription } } = await supabase.auth.onAuthStateChange(
+         (_event: string, session: Session | null) => {
+           setSession(session);
+           setUser(session?.user ?? null);
+           setLoading(false);
+         }
+       );
 
-    getInitialSession();
-  }, []);
+       return () => {
+         subscription.unsubscribe();
+       };
+     };
+
+     getInitialSession();
+   }, []);
 
   const signInWithGoogle = async () => {
-    if (!supabase) {
-      throw new Error('Supabase client not initialized. Check your environment variables.');
-    }
-    
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
+     // Only allow authentication on the client side
+     if (typeof window === 'undefined') {
+       throw new Error('Authentication is only available on the client side');
+     }
 
-    if (error) {
-      console.error('Error signing in with Google:', error.message);
-      throw error;
-    }
-  };
+     const supabase = getSupabaseClient();
+     if (!supabase) {
+       throw new Error('Supabase client not initialized. Check your environment variables.');
+     }
+     
+     const { error } = await supabase.auth.signInWithOAuth({
+       provider: 'google',
+       options: {
+         redirectTo: `${window.location.origin}/auth/callback`,
+       },
+     });
+
+     if (error) {
+       console.error('Error signing in with Google:', error.message);
+       throw error;
+     }
+   };
 
   const signInWithEmail = async (email: string, password: string) => {
-    if (!supabase) {
-      throw new Error('Supabase client not initialized. Check your environment variables.');
-    }
-    
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+     const supabase = getSupabaseClient();
+     if (!supabase) {
+       throw new Error('Supabase client not initialized. Check your environment variables.');
+     }
+     
+     const { error } = await supabase.auth.signInWithPassword({
+       email,
+       password,
+     });
 
-    if (error) {
-      console.error('Error signing in with email:', error.message);
-      throw error;
-    }
-  };
+     if (error) {
+       console.error('Error signing in with email:', error.message);
+       throw error;
+     }
+   };
 
   const signUpWithEmail = async (email: string, password: string) => {
-    if (!supabase) {
-      throw new Error('Supabase client not initialized. Check your environment variables.');
-    }
-    
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
+     const supabase = getSupabaseClient();
+     if (!supabase) {
+       throw new Error('Supabase client not initialized. Check your environment variables.');
+     }
+     
+     const { error } = await supabase.auth.signUp({
+       email,
+       password,
+     });
 
-    if (error) {
-      console.error('Error signing up with email:', error.message);
-      throw error;
-    }
-  };
+     if (error) {
+       console.error('Error signing up with email:', error.message);
+       throw error;
+     }
+   };
 
   const signOut = async () => {
-    if (!supabase) {
-      throw new Error('Supabase client not initialized. Check your environment variables.');
-    }
-    
-    const { error } = await supabase.auth.signOut();
-    
-    if (error) {
-      console.error('Error signing out:', error.message);
-      throw error;
-    }
-  };
+     const supabase = getSupabaseClient();
+     if (!supabase) {
+       throw new Error('Supabase client not initialized. Check your environment variables.');
+     }
+     
+     const { error } = await supabase.auth.signOut();
+     
+     if (error) {
+       console.error('Error signing out:', error.message);
+       throw error;
+     }
+   };
 
   const resetPassword = async (email: string) => {
-    if (!supabase) {
-      throw new Error('Supabase client not initialized. Check your environment variables.');
-    }
-    
-    const { error } = await supabase.auth.resetPasswordForEmail(email);
-    
-    if (error) {
-      console.error('Error resetting password:', error.message);
-      throw error;
-    }
-  };
+     const supabase = getSupabaseClient();
+     if (!supabase) {
+       throw new Error('Supabase client not initialized. Check your environment variables.');
+     }
+     
+     const { error } = await supabase.auth.resetPasswordForEmail(email);
+     
+     if (error) {
+       console.error('Error resetting password:', error.message);
+       throw error;
+     }
+   };
 
   const value = {
     user,
