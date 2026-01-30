@@ -19,7 +19,6 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isScraping, setIsScraping] = useState(false);
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
@@ -43,32 +42,6 @@ export default function Home() {
     }
   };
 
-  const handleScrape = async () => {
-    if (!searchQuery.trim()) return;
-
-    setIsScraping(true);
-    try {
-      const response = await fetch('/api/scrape', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: searchQuery }),
-      });
-      const data = await response.json();
-
-      if (response.ok) {
-        console.log('Скрейпинг завершен:', data);
-        // После скрейпинга обновляем результаты поиска
-        await handleSearch();
-      } else {
-        console.error('Ошибка скрейпинга:', data.error);
-      }
-    } catch (error) {
-      console.error('Ошибка при скрейпинге:', error);
-    } finally {
-      setIsScraping(false);
-    }
-  };
-
   return (
     <div className="flex flex-col items-center justify-center min-h-[80vh] gap-8">
       <div className="text-center space-y-4">
@@ -89,14 +62,11 @@ export default function Home() {
             placeholder="Поиск комплектующих (например, RTX 4060)"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
             className="flex-1"
           />
           <Button onClick={handleSearch} disabled={isLoading}>
             {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-          </Button>
-          <Button onClick={handleScrape} disabled={isScraping} variant="outline">
-            {isScraping ? <Loader2 className="h-4 w-4 animate-spin" /> : "Скрейпинг"}
           </Button>
         </div>
 
