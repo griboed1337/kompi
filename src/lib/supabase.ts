@@ -21,32 +21,9 @@ export const getSupabaseClient = () => {
   return supabaseClient;
 };
 
-// Export supabase as null initially to avoid module evaluation issues
-export const supabase = null;
-
-// Типы для базы данных
-export interface Product {
-  id?: string;
-  title: string;
-  price: string;
-  original_price?: string;
-  discount?: string;
-  link: string;
- image?: string;
-  availability?: string;
-  rating?: string;
-  store: string;
-  search_query: string;
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface ScrapingResult {
-  products: Product[];
-  totalFound: number;
-  success: boolean;
-  error?: string;
-}
+// Реэкспорт типов из централизованного файла
+export type { Product, ScrapingResult } from '@/types/product';
+import type { Product } from '@/types/product';
 
 // Define the Database interface for type safety
 export type Database = {
@@ -67,7 +44,7 @@ export type SupabaseClientType = SupabaseClient<Database>;
 export const createServerSupabase = () => {
   const url = process.env.SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  
+
   if (!url || !key) {
     console.error('Missing Supabase environment variables');
     throw new Error('Missing Supabase environment variables');

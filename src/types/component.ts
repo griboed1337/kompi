@@ -28,9 +28,9 @@ export interface PCComponent {
   reviews?: Review[];
 }
 
-export type ComponentCategory = 
+export type ComponentCategory =
   | 'cpu'
-  | 'gpu' 
+  | 'gpu'
   | 'motherboard'
   | 'ram'
   | 'storage'
@@ -61,7 +61,7 @@ export interface Review {
   source: string;
 }
 
-export interface ScrapingResult {
+export interface ComponentScrapingResult {
   components: PCComponent[];
   timestamp: Date;
   source: string;

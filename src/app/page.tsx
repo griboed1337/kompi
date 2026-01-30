@@ -5,15 +5,7 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { Computer, CheckCircle, Globe, Zap, Search, Loader2 } from "lucide-react";
 import { useState } from "react";
-
-interface Product {
-  id: string;
-  title: string;
-  price: string;
-  link: string;
-  image?: string;
-  store: string;
-}
+import type { Product } from "@/types";
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -98,7 +90,7 @@ export default function Home() {
           <Link href="/browse">Обзор компонентов</Link>
         </Button>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 max-w-4xl w-full">
         <div className="border rounded-lg p-6 text-center hover:shadow-md transition-shadow">
           <div className="mx-auto bg-primary/10 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
@@ -109,7 +101,7 @@ export default function Home() {
             Изучайте последние комплектующие для ПК с подробными характеристиками и ценами.
           </p>
         </div>
-        
+
         <div className="border rounded-lg p-6 text-center hover:shadow-md transition-shadow">
           <div className="mx-auto bg-primary/10 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
             <CheckCircle className="h-6 w-6 text-primary" />
@@ -119,7 +111,7 @@ export default function Home() {
             Убедитесь, что все ваши компоненты отлично работают вместе с нашей интеллектуальной системой совместимости.
           </p>
         </div>
-        
+
         <div className="border rounded-lg p-6 text-center hover:shadow-md transition-shadow">
           <div className="mx-auto bg-primary/10 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
             <Globe className="h-6 w-6 text-primary" />
@@ -130,7 +122,7 @@ export default function Home() {
           </p>
         </div>
       </div>
-      
+
       <div className="mt-16 max-w-4xl w-full">
         <h2 className="text-2xl font-bold text-center mb-8">Почему выбирают наш PC Конфигуратор?</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

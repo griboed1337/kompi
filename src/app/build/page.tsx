@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
+import { AiChat } from "@/components/build/AiChat";
 
 export default function BuildPage() {
   const [budget, setBudget] = useState<string>("");
@@ -23,17 +24,25 @@ export default function BuildPage() {
     { id: "cooler", name: "Система охлаждения", status: "not-selected" },
   ];
 
+  // Контекст для AI-ассистента
+  const aiContext = {
+    budget: budget ? parseInt(budget) : undefined,
+    usage,
+    experience,
+  };
+
   return (
     <div className="container py-8">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <div className="text-center mb-10">
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Сборка ПК</h1>
           <p className="text-muted-foreground mt-2">
-            Создайте свою идеальную конфигурацию с проверкой совместимости
+            Создайте свою идеальную конфигурацию с помощью AI-ассистента
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Левая колонка - Параметры и компоненты */}
           <div className="lg:col-span-2 space-y-6">
             <Card>
               <CardHeader>
@@ -82,8 +91,6 @@ export default function BuildPage() {
                     </SelectContent>
                   </Select>
                 </div>
-
-                <Button className="w-full">Подобрать компоненты</Button>
               </CardContent>
             </Card>
 
@@ -114,19 +121,12 @@ export default function BuildPage() {
             </Card>
           </div>
 
+          {/* Правая колонка - AI Чат и Итого */}
           <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Совместимость</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-8">
-                  <div className="text-4xl mb-2">✓</div>
-                  <p className="text-muted-foreground">Все компоненты совместимы</p>
-                </div>
-              </CardContent>
-            </Card>
+            {/* AI Чат */}
+            <AiChat context={aiContext} />
 
+            {/* Итого */}
             <Card>
               <CardHeader>
                 <CardTitle>Итого</CardTitle>
