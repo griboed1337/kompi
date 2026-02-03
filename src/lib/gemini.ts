@@ -1,4 +1,10 @@
-import { OpenAI } from 'openai';
+import { createGeminiProvider } from 'ai-sdk-provider-gemini-cli';
+import { generateText } from 'ai';
+
+// Инициализируем провайдер Gemini через CLI с OAuth
+const geminiProvider = createGeminiProvider({
+    authType: 'oauth-personal',
+});
 
 // Системный промпт для AI-ассистента по сборке ПК
 const SYSTEM_PROMPT = `Ты — эксперт по сборке персональных компьютеров и консультант магазина комплектующих.
@@ -33,7 +39,7 @@ SSD: NVMe PCIe 4.0/5.0
 Отвечай на русском языке.`;
 
 export interface ChatMessage {
-    role: 'user' | 'assistant';
+    role: 'user' | 'assistant' | 'system';
     content: string;
 }
 
@@ -43,28 +49,12 @@ export interface ChatContext {
     experience?: string;
 }
 
-// Инициализация клиента OpenAI для Hugging Face
-const getClient = () => {
-    const apiKey = process.env.HF_TOKEN;
-
-    if (!apiKey) {
-        throw new Error('HF_TOKEN не установлен в переменных окружения');
-    }
-
-    return new OpenAI({
-        baseURL: 'https://router.huggingface.co/v1',
-        apiKey,
-    });
-};
-
-// Функция для генерации ответа от AI
+// Функция для генерации ответа от AI через Gemini OAuth
 export async function generateAIResponse(
     messages: ChatMessage[],
     context?: ChatContext
 ): Promise<string> {
     try {
-        const client = getClient();
-
         // Формируем контекст сборки
         let contextPrompt = '';
         if (context) {
@@ -97,24 +87,16 @@ export async function generateAIResponse(
         // Собираем полный системный промпт
         const fullSystemPrompt = SYSTEM_PROMPT + contextPrompt;
 
-        // Формируем сообщения для API
-        const apiMessages: { role: 'system' | 'user' | 'assistant'; content: string }[] = [
-            { role: 'system', content: fullSystemPrompt },
-            ...messages.map(msg => ({
+        // Вызываем Gemini 3 Flash через Vercel AI SDK
+        const { text } = await generateText({
+            model: geminiProvider('gemini-3-flash-preview'),
+            system: fullSystemPrompt,
+            messages: messages.map(msg => ({
                 role: msg.role as 'user' | 'assistant',
                 content: msg.content
-            }))
-        ];
-
-        // Создаем запрос к Hugging Face
-        const chatCompletion = await client.chat.completions.create({
-            model: 'openai/gpt-oss-120b:groq',
-            messages: apiMessages,
-            max_tokens: 2048,
+            })),
             temperature: 0.7,
         });
-
-        const text = chatCompletion.choices[0]?.message?.content;
 
         if (!text) {
             return 'Извините, не удалось получить ответ. Попробуйте переформулировать вопрос.';
@@ -122,17 +104,13 @@ export async function generateAIResponse(
 
         return text;
     } catch (error) {
-        console.error('Ошибка Hugging Face API:', error);
+        console.error('Ошибка Gemini OAuth:', error);
 
-        // Более подробная информация об ошибке
         if (error instanceof Error) {
-            if (error.message.includes('API key') || error.message.includes('token') || error.message.includes('401')) {
-                throw new Error('Неверный токен. Проверьте HF_TOKEN в .env.local');
+            if (error.message.includes('Unauthorized') || error.message.includes('auth')) {
+                throw new Error('Ошибка авторизации. Проверьте статус `gemini auth status`');
             }
-            if (error.message.includes('quota') || error.message.includes('limit') || error.message.includes('429')) {
-                throw new Error('Превышен лимит запросов. Попробуйте позже.');
-            }
-            throw new Error(`Ошибка API: ${error.message}`);
+            throw new Error(`Ошибка AI: ${error.message}`);
         }
 
         throw new Error('Неизвестная ошибка при обращении к AI');
