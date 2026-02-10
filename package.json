@@ -1,5 +1,5 @@
 {
-  "name": "pc-configurator",
+  "name": "rigmaster",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -24,6 +24,8 @@
     "openai": "^6.17.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {

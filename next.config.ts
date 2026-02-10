@@ -6,7 +6,11 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
   },
   experimental: {
-    serverComponentsExternalPackages: ["@supabase/supabase-js"],
+    serverComponentsExternalPackages: [
+      "@supabase/supabase-js",
+      "ai-sdk-provider-gemini-cli",
+      "@google/gemini-cli"
+    ],
   },
 };
 

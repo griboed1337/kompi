@@ -25,31 +25,33 @@ export default function UserProfile() {
   };
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle>User Profile</CardTitle>
+    <Card className="w-full max-w-md border-none shadow-2xl bg-card/50 backdrop-blur-md overflow-hidden ring-1 ring-border/50">
+      <div className="h-1.5 w-full bg-gradient-to-r from-primary via-primary/50 to-transparent" />
+      <CardHeader className="p-8 pb-6">
+        <CardTitle className="text-3xl font-black">Профиль пользователя</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div>
-            <h3 className="text-sm font-medium text-gray-500">Email</h3>
-            <p className="text-lg">{user.email}</p>
+      <CardContent className="p-8 pt-0">
+        <div className="space-y-6">
+          <div className="space-y-1">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Email</h3>
+            <p className="text-lg font-semibold">{user.email}</p>
           </div>
-          <div>
-            <h3 className="text-sm font-medium text-gray-500">User ID</h3>
-            <p className="text-sm text-gray-600 font-mono">{user.id}</p>
+          <div className="space-y-1">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">ID Пользователя</h3>
+            <p className="text-sm text-muted-foreground font-mono bg-muted/30 p-2 rounded-lg border">{user.id}</p>
           </div>
-          <div className="pt-4">
-            <Button 
-              variant="destructive" 
+          <div className="pt-6">
+            <Button
+              variant="destructive"
               onClick={handleSignOut}
-              className="w-full"
+              className="w-full h-11 rounded-xl font-bold shadow-lg shadow-destructive/10"
             >
-              Sign Out
+              Выйти из аккаунта
             </Button>
           </div>
         </div>
       </CardContent>
     </Card>
+
   );
 }

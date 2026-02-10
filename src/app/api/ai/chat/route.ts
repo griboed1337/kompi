@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { generateAIResponse, ChatMessage, ChatContext } from '@/lib/gemini';
+import { generateAIResponse } from '@/lib/gemini';
+import { ChatMessage, ChatContext } from '@/lib/ai-types';
 
 export async function POST(request: NextRequest) {
     try {
@@ -38,10 +39,11 @@ export async function POST(request: NextRequest) {
         });
 
     } catch (error) {
-        console.error('AI Chat API error:', error);
+        console.error('AI Chat API error FULL:', error);
 
         // Проверяем тип ошибки
         const errorMessage = error instanceof Error ? error.message : 'Неизвестная ошибка';
+
 
         // Если проблема с API ключом
         if (errorMessage.includes('API key') || errorMessage.includes('GEMINI_API_KEY')) {

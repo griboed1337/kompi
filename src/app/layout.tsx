@@ -15,9 +15,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PC Configurator",
-  description: "Build your dream PC with our configurator",
+  title: "RigMaster — Конфигуратор ПК",
+  description: "Соберите ПК своей мечты с помощью RigMaster и AI-консультанта",
 };
+
 
 export default function RootLayout({
   children,
@@ -31,9 +32,10 @@ export default function RootLayout({
       >
         <AuthProvider>
           <Navbar />
-          <main className="container py-6">
+          <main className="py-6">
             {children}
           </main>
+
         </AuthProvider>
       </body>
     </html>

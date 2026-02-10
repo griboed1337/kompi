@@ -37,14 +37,15 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[80vh] gap-8">
       <div className="text-center space-y-4">
-        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
-          Соберите свой идеальный ПК
+        <h1 className="text-5xl font-black tracking-tight sm:text-6xl md:text-7xl">
+          Соберите свой идеальный ПК с <span className="text-primary italic">RigMaster</span>
         </h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          Настраивайте, сравнивайте и находите лучшие предложения на комплектующие для ПК с помощью нашего мощного инструмента.
-          Проверяйте совместимость, цены и производительность в одном месте.
+        <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+          Настраивайте, сравнивайте и находите лучшие предложения на комплектующие с помощью RigMaster —
+          вашего персонального AI-эксперта в мире компьютерного железа.
         </p>
       </div>
+
 
       {/* Поиск продуктов */}
       <div className="w-full max-w-2xl space-y-4">
@@ -124,7 +125,8 @@ export default function Home() {
       </div>
 
       <div className="mt-16 max-w-4xl w-full">
-        <h2 className="text-2xl font-bold text-center mb-8">Почему выбирают наш PC Конфигуратор?</h2>
+        <h2 className="text-3xl font-bold text-center mb-8">Почему выбирают <span className="text-primary italic">RigMaster</span>?</h2>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex items-start gap-4">
             <Zap className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
