@@ -21,6 +21,24 @@ export const getSupabaseClient = () => {
   return supabaseClient;
 };
 
+// Функция для получения админ-клиента (в обход RLS)
+export const getAdminSupabaseClient = () => {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!url || !key || key.includes('your-service-role')) {
+    console.warn('SUPABASE_SERVICE_ROLE_KEY не настроен или содержит значение по умолчанию');
+    return null;
+  }
+
+  return createClient(url, key, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  });
+};
+
 // Реэкспорт типов из централизованного файла
 export type { Product, ScrapingResult } from '@/types/product';
 import type { Product } from '@/types/product';

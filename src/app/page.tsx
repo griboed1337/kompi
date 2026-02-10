@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import { Computer, CheckCircle, Globe, Zap, Search, Loader2 } from "lucide-react";
+import { Computer, CheckCircle, Globe, Zap, Search, Loader2, Sparkles } from "lucide-react";
 import { useState } from "react";
 import type { Product } from "@/types";
 
@@ -37,10 +37,10 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[80vh] gap-8">
       <div className="text-center space-y-4">
-        <h1 className="text-5xl font-black tracking-tight sm:text-6xl md:text-7xl">
-          Соберите свой идеальный ПК с <span className="text-primary italic">RigMaster</span>
+        <h1 className="text-5xl font-black tracking-tight sm:text-6xl md:text-7xl animate-forge-fly-in">
+          Соберите свой идеальный ПК с <span className="forge-gradient-text italic animate-forge-glow">RigMaster</span>
         </h1>
-        <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+        <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed animate-forge-fly-in delay-200">
           Настраивайте, сравнивайте и находите лучшие предложения на комплектующие с помощью RigMaster —
           вашего персонального AI-эксперта в мире компьютерного железа.
         </p>
@@ -48,7 +48,7 @@ export default function Home() {
 
 
       {/* Поиск продуктов */}
-      <div className="w-full max-w-2xl space-y-4">
+      <div className="w-full max-w-2xl space-y-4 animate-forge-fly-in delay-400">
         <div className="flex gap-2">
           <Input
             type="text"
@@ -83,49 +83,49 @@ export default function Home() {
         )}
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4">
+      <div className="flex flex-col sm:flex-row gap-4 animate-forge-fly-in delay-500">
         <Button asChild size="lg">
           <Link href="/build">Начать сборку</Link>
         </Button>
-        <Button asChild size="lg" variant="outline">
+        <Button asChild size="lg" variant="outline" className="forge-border-glow">
           <Link href="/browse">Обзор компонентов</Link>
         </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 max-w-4xl w-full">
-        <div className="border rounded-lg p-6 text-center hover:shadow-md transition-shadow">
-          <div className="mx-auto bg-primary/10 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
-            <Computer className="h-6 w-6 text-primary" />
+        <div className="border rounded-lg p-6 text-center hover:shadow-xl hover:shadow-blue-500/10 transition-all hover:border-blue-500/40 hover:-translate-y-1 bg-gradient-to-br from-background to-blue-500/5 border-blue-500/10 group cursor-default animate-forge-fly-in delay-600">
+          <div className="mx-auto bg-blue-500/10 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-blue-500/20 transition-all">
+            <Computer className="h-6 w-6 text-blue-500" />
           </div>
-          <h3 className="font-semibold text-lg mb-2">Обзор компонентов</h3>
+          <h3 className="font-semibold text-lg mb-2 group-hover:text-blue-500 transition-colors">Обзор компонентов</h3>
           <p className="text-muted-foreground text-sm">
             Изучайте последние комплектующие для ПК с подробными характеристиками и ценами.
           </p>
         </div>
 
-        <div className="border rounded-lg p-6 text-center hover:shadow-md transition-shadow">
-          <div className="mx-auto bg-primary/10 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
-            <CheckCircle className="h-6 w-6 text-primary" />
+        <div className="border rounded-lg p-6 text-center hover:shadow-xl hover:shadow-emerald-500/10 transition-all hover:border-emerald-500/40 hover:-translate-y-1 bg-gradient-to-br from-background to-emerald-500/5 border-emerald-500/10 group cursor-default animate-forge-fly-in delay-600">
+          <div className="mx-auto bg-emerald-500/10 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-emerald-500/20 transition-all">
+            <CheckCircle className="h-6 w-6 text-emerald-500" />
           </div>
-          <h3 className="font-semibold text-lg mb-2">Проверка совместимости</h3>
+          <h3 className="font-semibold text-lg mb-2 group-hover:text-emerald-500 transition-colors">Проверка совместимости</h3>
           <p className="text-muted-foreground text-sm">
             Убедитесь, что все ваши компоненты отлично работают вместе с нашей интеллектуальной системой совместимости.
           </p>
         </div>
 
-        <div className="border rounded-lg p-6 text-center hover:shadow-md transition-shadow">
-          <div className="mx-auto bg-primary/10 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
-            <Globe className="h-6 w-6 text-primary" />
+        <div className="border rounded-lg p-6 text-center hover:shadow-xl hover:shadow-amber-500/10 transition-all hover:border-amber-500/40 hover:-translate-y-1 bg-gradient-to-br from-background to-amber-500/5 border-amber-500/10 group cursor-default animate-forge-fly-in delay-600">
+          <div className="mx-auto bg-amber-500/10 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-amber-500/20 transition-all">
+            <Sparkles className="h-6 w-6 text-amber-500" />
           </div>
-          <h3 className="font-semibold text-lg mb-2">Глобальные цены</h3>
+          <h3 className="font-semibold text-lg mb-2 group-hover:text-amber-500 transition-colors">ИИ-советник</h3>
           <p className="text-muted-foreground text-sm">
-            Сравнивайте цены у разных ритейлеров и в разных регионах мира.
+            Ультимативный нейро-подбор компонентов и проверка совместимости в 1 клик.
           </p>
         </div>
       </div>
 
       <div className="mt-16 max-w-4xl w-full">
-        <h2 className="text-3xl font-bold text-center mb-8">Почему выбирают <span className="text-primary italic">RigMaster</span>?</h2>
+        <h2 className="text-3xl font-bold text-center mb-8">Почему выбирают <span className="forge-gradient-text italic animate-forge-glow">RigMaster</span>?</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex items-start gap-4">
