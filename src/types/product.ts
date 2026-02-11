@@ -3,16 +3,18 @@
 export interface Product {
     id?: string;
     title: string;
-    price: string;
-    original_price?: string;
+    price: number;
+    original_price?: number;
     discount?: string;
     link: string;
     image?: string;
+    description?: string;
     availability?: string;
     rating?: string;
     store: string;
     search_query?: string;
     created_at?: string;
+    specs?: Record<string, any>;
     updated_at?: string;
 }
 

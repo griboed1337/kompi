@@ -19,7 +19,6 @@ export function Navbar() {
     { name: "Обзор", href: "/browse" },
     { name: "Сборка", href: "/build" },
     { name: "Сравнение", href: "/compare" },
-    { name: "Акции", href: "/deals" },
     ...(isAdmin ? [{ name: "Админ", href: "/admin" }] : []),
   ];
 

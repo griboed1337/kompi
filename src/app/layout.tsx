@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "RigMaster — Конфигуратор ПК",
-  description: "Соберите ПК своей мечты с помощью RigMaster и AI-консультанта",
+  title: "RigMaster — PC Configurator",
+  description: "Build your dream PC with RigMaster and AI consultant",
 };
 
 

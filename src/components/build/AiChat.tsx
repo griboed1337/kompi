@@ -18,7 +18,7 @@ export function AiChat({ context }: AiChatProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [mode, setMode] = useState<'beginner' | 'advanced'>(context?.experience === 'advanced' ? 'advanced' : 'beginner');
-    const messagesEndRef = useRef<HTMLDivElement>(null);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
 
     // Синхронизация режима с внешним контекстом, если он изменился
     useEffect(() => {
@@ -28,7 +28,9 @@ export function AiChat({ context }: AiChatProps) {
     }, [context?.experience]);
 
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        if (messages.length > 0 && scrollContainerRef.current) {
+            scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+        }
     }, [messages]);
 
     const sendMessage = async (messageText?: string) => {
@@ -118,7 +120,10 @@ export function AiChat({ context }: AiChatProps) {
             </CardHeader>
 
             <CardContent className="flex flex-col flex-1 overflow-hidden p-4 pt-4">
-                <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2 scrollbar-thin scrollbar-thumb-primary/10 scrollbar-track-transparent">
+                <div
+                    ref={scrollContainerRef}
+                    className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2 scrollbar-thin scrollbar-thumb-primary/10 scrollbar-track-transparent"
+                >
                     {messages.length === 0 ? (
                         <div className="text-center py-12">
                             <Bot className="h-16 w-16 mx-auto text-primary/20 mb-6" />
@@ -200,7 +205,6 @@ export function AiChat({ context }: AiChatProps) {
                             {error}
                         </div>
                     )}
-                    <div ref={messagesEndRef} />
                 </div>
                 <div className="flex gap-2 p-1 bg-muted/30 rounded-2xl border">
                     <Input

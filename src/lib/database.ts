@@ -7,14 +7,31 @@ export type { Product };
 // Функция-хелпер для получения имени таблицы по категории
 function getTableName(category: string): string {
   const cat = category.toLowerCase();
-  if (cat.includes('процессор')) return 'products_cpu';
-  if (cat.includes('видеокарт')) return 'products_gpu';
-  if (cat.includes('плата')) return 'products_motherboard';
+
+  // Процессоры
+  if (cat.includes('процессор') || cat === 'cpu') return 'products_cpu';
+
+  // Видеокарты
+  if (cat.includes('видеокарт') || cat === 'gpu') return 'products_gpu';
+
+  // Материнские платы
+  if (cat.includes('плата') || cat === 'motherboard') return 'products_motherboard';
+
+  // Оперативная память
   if (cat.includes('память') || cat.includes('ram')) return 'products_ram';
-  if (cat.includes('накопител') || cat.includes('ssd') || cat.includes('hdd')) return 'products_ssd';
+
+  // Накопители
+  if (cat.includes('накопител') || cat.includes('ssd') || cat.includes('hdd') || cat === 'storage') return 'products_ssd';
+
+  // Блоки питания
   if (cat.includes('блок питания') || cat.includes('psu')) return 'products_psu';
-  if (cat.includes('корпус')) return 'products_case';
-  if (cat.includes('охлажден') || cat.includes('кулер')) return 'products_cooling';
+
+  // Корпуса
+  if (cat.includes('корпус') || cat === 'case') return 'products_case';
+
+  // Охлаждение
+  if (cat.includes('охлажден') || cat.includes('кулер') || cat === 'cooler') return 'products_cooling';
+
   return 'products'; // fallback
 }
 
@@ -75,7 +92,6 @@ export async function getProductsByQuery(searchQuery: string, store?: string): P
     let queryBuilder = supabase
       .from(tableName as any)
       .select('*')
-      .eq('search_query', searchQuery)
       .order('created_at', { ascending: false });
 
     if (store) {
@@ -139,14 +155,14 @@ export async function getAllProducts(page: number = 1, limit: number = 50, store
 }
 
 // Функция для поиска продуктов по названию
-export async function searchProducts(query: string, store?: string): Promise<{ products: Product[]; error?: string }> {
+export async function searchProducts(query: string, store?: string, category?: string): Promise<{ products: Product[]; error?: string }> {
   try {
     const supabase = getSupabaseClient();
     if (!supabase) {
       return { products: [], error: 'Supabase client not initialized' };
     }
 
-    const tableName = getTableName(query);
+    const tableName = getTableName(category || query);
     let supabaseQuery = supabase
       .from(tableName as any)
       .select('*')
