@@ -94,7 +94,7 @@ export function ProductCard({ product, onSelect, isSelected }: ProductCardProps)
                         size="sm"
                         className={`rounded-xl px-4 h-9 text-xs font-bold transition-all ${isSelected
                             ? 'bg-green-500 hover:bg-green-600 text-white'
-                            : 'forge-border-glow bg-transparent hover:scale-105 active:scale-95'
+                            : 'bg-primary/10 border border-primary/20 text-primary hover:bg-primary hover:text-primary-foreground hover:scale-105 active:scale-95'
                             }`}
                     >
                         {isSelected ? (

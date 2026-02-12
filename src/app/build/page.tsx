@@ -9,12 +9,14 @@ import { useState, useMemo } from "react";
 import { AiChat } from "@/components/build/AiChat";
 import { ProductSelector } from "@/components/build/ProductSelector";
 import { Product } from "@/lib/database";
-import { Sparkles, Trash2, ExternalLink } from "lucide-react";
+import { Sparkles, Trash2, ExternalLink, RefreshCcw } from "lucide-react";
 
 export default function BuildPage() {
   const [budget, setBudget] = useState<string>("");
   const [usage, setUsage] = useState<string>("gaming");
   const [experience, setExperience] = useState<string>("beginner");
+  const [isGeneratingBuild, setIsGeneratingBuild] = useState(false);
+  const [generationError, setGenerationError] = useState<string | null>(null);
 
   // Состояние выбранных продуктов
   const [selectedProducts, setSelectedProducts] = useState<Record<string, Product>>({});
@@ -84,6 +86,41 @@ export default function BuildPage() {
     selectedProducts: Object.values(selectedProducts).map(p => p.title)
   };
 
+  const handleSmartBuild = async () => {
+    setIsGeneratingBuild(true);
+    setGenerationError(null);
+    try {
+      const response = await fetch('/api/ai/generate-build', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ context: aiContext })
+      });
+
+      const data = await response.json();
+      if (!data.success) throw new Error(data.error || 'Ошибка генерации');
+
+      // Применяем полученную сборку
+      const newSelectedProducts: Record<string, Product> = {};
+
+      data.build.forEach((item: any) => {
+        if (item.product) {
+          newSelectedProducts[item.category] = item.product;
+        }
+      });
+
+      setSelectedProducts(prev => ({
+        ...prev,
+        ...newSelectedProducts
+      }));
+
+    } catch (err) {
+      console.error('Smart build error:', err);
+      setGenerationError(err instanceof Error ? err.message : 'Ошибка при подборе компонентов');
+    } finally {
+      setIsGeneratingBuild(false);
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 md:px-12 py-8">
       <div className="max-w-[1440px] mx-auto">
@@ -149,6 +186,31 @@ export default function BuildPage() {
                       <SelectItem value="advanced">Эксперт</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+
+                <div className="md:col-span-3 pt-2 flex flex-col gap-3">
+                  <Button
+                    onClick={handleSmartBuild}
+                    disabled={isGeneratingBuild}
+                    className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase tracking-widest shadow-lg shadow-primary/20 rounded-xl transition-all hover:scale-[1.01]"
+                  >
+                    {isGeneratingBuild ? (
+                      <>
+                        <RefreshCcw className="h-4 w-4 mr-2 animate-spin" />
+                        RigMaster подбирает лучшее...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="h-4 w-4 mr-2" />
+                        Сгенерировать лучшую сборку
+                      </>
+                    )}
+                  </Button>
+                  {generationError && (
+                    <p className="text-[10px] text-destructive font-bold text-center italic">
+                      {generationError}
+                    </p>
+                  )}
                 </div>
               </CardContent>
             </Card>

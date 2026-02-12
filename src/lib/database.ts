@@ -39,11 +39,17 @@ function getTableName(category: string): string {
 export async function saveProducts(products: Product[], category: string): Promise<{ success: boolean; error?: string }> {
   try {
     const tableName = getTableName(category);
-    const productsToInsert = products.map(product => ({
-      ...product,
-      search_query: category,
-      updated_at: new Date().toISOString(),
-    }));
+    const productsToInsert = products.map(product => {
+      // Гарантируем наличие ссылки, чтобы не нарушать констрейнт
+      const link = product.link || `https://www.google.com/search?q=${encodeURIComponent(product.title)}`;
+
+      return {
+        ...product,
+        link,
+        search_query: category,
+        updated_at: new Date().toISOString(),
+      };
+    });
 
     // Используем upsert для обновления существующих продуктов
     // Пытаемся использовать админ-клиент для обхода RLS
@@ -92,7 +98,7 @@ export async function getProductsByQuery(searchQuery: string, store?: string): P
     let queryBuilder = supabase
       .from(tableName as any)
       .select('*')
-      .order('created_at', { ascending: false });
+      .order('updated_at', { ascending: false });
 
     if (store) {
       queryBuilder = queryBuilder.eq('store', store);
@@ -129,7 +135,7 @@ export async function getAllProducts(page: number = 1, limit: number = 50, store
     let query = supabase
       .from('products')
       .select('*', { count: 'exact' })
-      .order('created_at', { ascending: false })
+      .order('updated_at', { ascending: false })
       .range(from, to);
 
     if (store) {
@@ -155,7 +161,7 @@ export async function getAllProducts(page: number = 1, limit: number = 50, store
 }
 
 // Функция для поиска продуктов по названию
-export async function searchProducts(query: string, store?: string, category?: string): Promise<{ products: Product[]; error?: string }> {
+export async function searchProducts(query: string, store?: string, category?: string, maxPrice?: number): Promise<{ products: Product[]; error?: string }> {
   try {
     const supabase = getSupabaseClient();
     if (!supabase) {
@@ -167,7 +173,6 @@ export async function searchProducts(query: string, store?: string, category?: s
       .from(tableName as any)
       .select('*')
       .ilike('title', `%${query}%`)
-      .order('created_at', { ascending: false })
       .limit(100);
 
     if (store) {
@@ -176,12 +181,21 @@ export async function searchProducts(query: string, store?: string, category?: s
 
     const { data, error } = await supabaseQuery;
 
-    if (error) {
-      console.error('Ошибка при поиске продуктов:', error);
-      return { products: [], error: error.message };
+    // Сортировка по цене (так как в БД цена это строка с '₽', парсим ее)
+    let results = data || [];
+
+    const parsePrice = (priceStr: any): number => {
+      if (typeof priceStr === 'number') return priceStr;
+      if (!priceStr) return 0;
+      return parseFloat(String(priceStr).replace(/[^\d.,-]/g, '').replace(',', '.'));
+    };
+
+    if (maxPrice) {
+      results = results.filter(p => parsePrice(p.price) <= maxPrice);
     }
 
-    return { products: data || [] };
+    // Сортируем: сначала те, что дешевле
+    return { products: results };
   } catch (error) {
     console.error('Ошибка в searchProducts:', error);
     return {

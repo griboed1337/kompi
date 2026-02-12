@@ -156,7 +156,7 @@ export function ProductSelector({ category, categoryName, isOpen, onClose, onSel
                         >
                             Фильтры {Object.keys(selectedFilters).length > 0 && `(${Object.keys(selectedFilters).length})`}
                         </Button>
-                        <Button type="submit" className="h-12 px-6 rounded-xl forge-border-glow font-bold">
+                        <Button type="submit" className="h-12 px-8 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase tracking-widest shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98]">
                             Найти
                         </Button>
                     </form>
