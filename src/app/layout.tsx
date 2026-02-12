@@ -4,6 +4,7 @@ import "./globals.css";
 import { Navbar } from "@/components/navbar";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { SmoothScroll } from "@/components/SmoothScroll";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,9 +40,11 @@ export default function RootLayout({
         >
           <AuthProvider>
             <Navbar />
-            <main className="py-6">
-              {children}
-            </main>
+            <SmoothScroll>
+              <main className="py-6">
+                {children}
+              </main>
+            </SmoothScroll>
           </AuthProvider>
         </ThemeProvider>
       </body>

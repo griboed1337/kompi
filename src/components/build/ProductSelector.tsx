@@ -1,10 +1,12 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Product } from "@/lib/database";
 import { ProductCard } from "./ProductCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, X, Loader2, Info } from "lucide-react";
+import { useLenis } from "lenis/react";
+import { SmoothScroll } from "@/components/SmoothScroll";
 
 interface ProductSelectorProps {
     category: string;
@@ -22,17 +24,23 @@ export function ProductSelector({ category, categoryName, isOpen, onClose, onSel
     const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
     const [showFilters, setShowFilters] = useState(false);
 
+    const lenis = useLenis();
+
     useEffect(() => {
         if (isOpen) {
             fetchProducts();
             setSelectedFilters({});
-            // Запрещаем прокрутку body при открытом селекторе
             document.body.style.overflow = 'hidden';
+            lenis?.stop();
         } else {
             document.body.style.overflow = 'unset';
+            lenis?.start();
         }
-        return () => { document.body.style.overflow = 'unset'; };
-    }, [isOpen, category]);
+        return () => {
+            document.body.style.overflow = 'unset';
+            lenis?.start();
+        };
+    }, [isOpen, category, lenis]);
 
     const fetchProducts = async (searchQuery?: string) => {
         setIsLoading(true);
@@ -190,53 +198,55 @@ export function ProductSelector({ category, categoryName, isOpen, onClose, onSel
                 </div>
 
                 {/* Список товаров */}
-                <div className="flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent">
-                    {isLoading ? (
-                        <div className="h-full flex flex-col items-center justify-center space-y-4">
-                            <Loader2 className="h-10 w-10 animate-spin text-primary" />
-                            <p className="text-sm font-bold animate-pulse italic">AI-ассистент ищет лучшие предложения...</p>
-                        </div>
-                    ) : error ? (
-                        <div className="h-full flex flex-col items-center justify-center text-center p-8">
-                            <X className="h-12 w-12 text-destructive mb-4" />
-                            <h3 className="text-lg font-bold mb-2">Ошибка</h3>
-                            <p className="text-muted-foreground max-w-xs">{error}</p>
-                            <Button variant="outline" onClick={() => fetchProducts()} className="mt-4 rounded-xl">
-                                Попробовать снова
-                            </Button>
-                        </div>
-                    ) : filteredProducts.length === 0 ? (
-                        <div className="h-full flex flex-col items-center justify-center text-center p-8">
-                            <Info className="h-12 w-12 text-muted-foreground mb-4" />
-                            <h3 className="text-lg font-bold mb-2">Ничего не найдено</h3>
-                            <p className="text-muted-foreground max-w-xs italic">
-                                {Object.keys(selectedFilters).length > 0
-                                    ? "Попробуйте сбросить фильтры или изменить поисковый запрос."
-                                    : "Попробуйте изменить запрос или вернитесь позже, когда AI обновит базу."}
-                            </p>
-                            {Object.keys(selectedFilters).length > 0 && (
-                                <Button variant="link" onClick={() => setSelectedFilters({})} className="mt-2 text-primary">
-                                    Сбросить фильтры
+                <SmoothScroll root={false} className="flex-1">
+                    <div className="p-6">
+                        {isLoading ? (
+                            <div className="h-full flex flex-col items-center justify-center space-y-4">
+                                <Loader2 className="h-10 w-10 animate-spin text-primary" />
+                                <p className="text-sm font-bold animate-pulse italic">AI-ассистент ищет лучшие предложения...</p>
+                            </div>
+                        ) : error ? (
+                            <div className="h-full flex flex-col items-center justify-center text-center p-8">
+                                <X className="h-12 w-12 text-destructive mb-4" />
+                                <h3 className="text-lg font-bold mb-2">Ошибка</h3>
+                                <p className="text-muted-foreground max-w-xs">{error}</p>
+                                <Button variant="outline" onClick={() => fetchProducts()} className="mt-4 rounded-xl">
+                                    Попробовать снова
                                 </Button>
-                            )}
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {filteredProducts.map((product) => (
-                                <div key={product.id} className="animate-in fade-in slide-in-from-bottom-5 duration-500 fill-mode-both">
-                                    <ProductCard
-                                        product={product}
-                                        isSelected={false} // Можно добавить проверку, если нужно
-                                        onSelect={(p) => {
-                                            onSelect(p);
-                                            onClose();
-                                        }}
-                                    />
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
+                            </div>
+                        ) : filteredProducts.length === 0 ? (
+                            <div className="h-full flex flex-col items-center justify-center text-center p-8">
+                                <Info className="h-12 w-12 text-muted-foreground mb-4" />
+                                <h3 className="text-lg font-bold mb-2">Ничего не найдено</h3>
+                                <p className="text-muted-foreground max-w-xs italic">
+                                    {Object.keys(selectedFilters).length > 0
+                                        ? "Попробуйте сбросить фильтры или изменить поисковый запрос."
+                                        : "Попробуйте изменить запрос или вернитесь позже, когда AI обновит базу."}
+                                </p>
+                                {Object.keys(selectedFilters).length > 0 && (
+                                    <Button variant="link" onClick={() => setSelectedFilters({})} className="mt-2 text-primary">
+                                        Сбросить фильтры
+                                    </Button>
+                                )}
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {filteredProducts.map((product) => (
+                                    <div key={product.id} className="animate-in fade-in slide-in-from-bottom-5 duration-500 fill-mode-both">
+                                        <ProductCard
+                                            product={product}
+                                            isSelected={false} // Можно добавить проверку, если нужно
+                                            onSelect={(p) => {
+                                                onSelect(p);
+                                                onClose();
+                                            }}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </SmoothScroll>
             </div>
         </div>
     );

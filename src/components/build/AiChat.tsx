@@ -7,6 +7,7 @@ import { Send, Loader2, Bot, User, Sparkles, Brain, Zap } from "lucide-react";
 import { QUICK_QUESTIONS, ChatMessage, ChatContext } from "@/lib/ai-types";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { SmoothScroll } from "@/components/SmoothScroll";
 
 interface AiChatProps {
     context?: ChatContext;
@@ -18,7 +19,6 @@ export function AiChat({ context }: AiChatProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [mode, setMode] = useState<'beginner' | 'advanced'>(context?.experience === 'advanced' ? 'advanced' : 'beginner');
-    const scrollContainerRef = useRef<HTMLDivElement>(null);
 
     // Синхронизация режима с внешним контекстом, если он изменился
     useEffect(() => {
@@ -26,12 +26,6 @@ export function AiChat({ context }: AiChatProps) {
             setMode(context.experience === 'advanced' ? 'advanced' : 'beginner');
         }
     }, [context?.experience]);
-
-    useEffect(() => {
-        if (messages.length > 0 && scrollContainerRef.current) {
-            scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
-        }
-    }, [messages]);
 
     const sendMessage = async (messageText?: string) => {
         const text = messageText || input.trim();
@@ -120,92 +114,91 @@ export function AiChat({ context }: AiChatProps) {
             </CardHeader>
 
             <CardContent className="flex flex-col flex-1 overflow-hidden p-4 pt-4">
-                <div
-                    ref={scrollContainerRef}
-                    className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2 scrollbar-thin scrollbar-thumb-primary/10 scrollbar-track-transparent"
-                >
-                    {messages.length === 0 ? (
-                        <div className="text-center py-12">
-                            <Bot className="h-16 w-16 mx-auto text-primary/20 mb-6" />
-                            <h3 className="text-xl font-bold mb-2">Чем я могу помочь?</h3>
-                            <p className="text-muted-foreground mb-8 max-w-[300px] mx-auto text-sm">
-                                Я помогу подобрать комплектующие, проверю совместимость или сравню видеокарты.
-                            </p>
-                            <div className="flex flex-wrap gap-2 justify-center">
-                                {QUICK_QUESTIONS.map((q, i) => (
-                                    <Button
-                                        key={i}
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => sendMessage(q)}
-                                        disabled={isLoading}
-                                        className="text-xs hover:bg-primary/10 transition-colors"
-                                    >
-                                        {q}
-                                    </Button>
-                                ))}
+                <SmoothScroll root={false} className="flex-1">
+                    <div className="space-y-4 mb-4 pr-2">
+                        {messages.length === 0 ? (
+                            <div className="text-center py-12">
+                                <Bot className="h-16 w-16 mx-auto text-primary/20 mb-6" />
+                                <h3 className="text-xl font-bold mb-2">Чем я могу помочь?</h3>
+                                <p className="text-muted-foreground mb-8 max-w-[300px] mx-auto text-sm">
+                                    Я помогу подобрать комплектующие, проверю совместимость или сравню видеокарты.
+                                </p>
+                                <div className="flex flex-wrap gap-2 justify-center">
+                                    {QUICK_QUESTIONS.map((q, i) => (
+                                        <Button
+                                            key={i}
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => sendMessage(q)}
+                                            disabled={isLoading}
+                                            className="text-xs hover:bg-primary/10 transition-colors"
+                                        >
+                                            {q}
+                                        </Button>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
-                    ) : (
-                        messages.map((msg, i) => (
-                            <div
-                                key={i}
-                                className={`flex gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-                            >
-                                {msg.role === "assistant" && (
-                                    <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 border border-primary/20">
-                                        <Bot className="h-4 w-4 text-primary" />
-                                    </div>
-                                )}
+                        ) : (
+                            messages.map((msg, i) => (
                                 <div
-                                    className={`max-w-[95%] sm:max-w-[85%] rounded-2xl px-4 py-3 shadow-sm overflow-hidden ${msg.role === "user"
-                                        ? "bg-primary text-primary-foreground rounded-tr-none"
-                                        : "bg-muted/50 border border-muted-foreground/10 rounded-tl-none font-light"
-                                        }`}
+                                    key={i}
+                                    className={`flex gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                                 >
-                                    {msg.role === "assistant" ? (
-                                        <div className="prose prose-sm prose-slate dark:prose-invert max-w-none 
-                                            break-words
-                                            prose-headings:font-bold prose-headings:mb-2 
-                                            prose-p:leading-relaxed prose-p:mb-3 
-                                            prose-li:list-disc prose-ul:ml-4
-                                            prose-table:block prose-table:w-full prose-table:overflow-x-auto prose-table:border-collapse
-                                            prose-table:my-4 prose-table:text-xs
-                                            prose-th:bg-muted prose-th:p-2 prose-th:text-xs prose-th:text-left prose-th:border
-                                            prose-td:p-2 prose-td:border prose-td:text-xs">
-                                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                                {msg.content}
-                                            </ReactMarkdown>
+                                    {msg.role === "assistant" && (
+                                        <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 border border-primary/20">
+                                            <Bot className="h-4 w-4 text-primary" />
                                         </div>
-                                    ) : (
-                                        <div className="text-sm whitespace-pre-wrap break-words">{msg.content}</div>
+                                    )}
+                                    <div
+                                        className={`max-w-[95%] sm:max-w-[85%] rounded-2xl px-4 py-3 shadow-sm overflow-hidden ${msg.role === "user"
+                                            ? "bg-primary text-primary-foreground rounded-tr-none"
+                                            : "bg-muted/50 border border-muted-foreground/10 rounded-tl-none font-light"
+                                            }`}
+                                    >
+                                        {msg.role === "assistant" ? (
+                                            <div className="prose prose-sm prose-slate dark:prose-invert max-w-none 
+                                                break-words
+                                                prose-headings:font-bold prose-headings:mb-2 
+                                                prose-p:leading-relaxed prose-p:mb-3 
+                                                prose-li:list-disc prose-ul:ml-4
+                                                prose-table:block prose-table:w-full prose-table:overflow-x-auto prose-table:border-collapse
+                                                prose-table:my-4 prose-table:text-xs
+                                                prose-th:bg-muted prose-th:p-2 prose-th:text-xs prose-th:text-left prose-th:border
+                                                prose-td:p-2 prose-td:border prose-td:text-xs">
+                                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                                    {msg.content}
+                                                </ReactMarkdown>
+                                            </div>
+                                        ) : (
+                                            <div className="text-sm whitespace-pre-wrap break-words">{msg.content}</div>
+                                        )}
+                                    </div>
+                                    {msg.role === "user" && (
+                                        <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center flex-shrink-0 shadow-lg shadow-primary/20">
+                                            <User className="h-4 w-4 text-primary-foreground" />
+                                        </div>
                                     )}
                                 </div>
-                                {msg.role === "user" && (
-                                    <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center flex-shrink-0 shadow-lg shadow-primary/20">
-                                        <User className="h-4 w-4 text-primary-foreground" />
-                                    </div>
-                                )}
-                            </div>
-                        ))
-                    )}
+                            ))
+                        )}
 
-                    {isLoading && (
-                        <div className="flex gap-3">
-                            <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20">
-                                <Bot className="h-4 w-4 text-primary" />
+                        {isLoading && (
+                            <div className="flex gap-3">
+                                <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20">
+                                    <Bot className="h-4 w-4 text-primary" />
+                                </div>
+                                <div className="bg-muted/50 border border-muted-foreground/10 rounded-2xl rounded-tl-none px-4 py-3">
+                                    <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                                </div>
                             </div>
-                            <div className="bg-muted/50 border border-muted-foreground/10 rounded-2xl rounded-tl-none px-4 py-3">
-                                <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                        )}
+                        {error && (
+                            <div className="bg-destructive/10 text-destructive border border-destructive/20 rounded-xl px-4 py-2 text-sm text-center">
+                                {error}
                             </div>
-                        </div>
-                    )}
-                    {error && (
-                        <div className="bg-destructive/10 text-destructive border border-destructive/20 rounded-xl px-4 py-2 text-sm text-center">
-                            {error}
-                        </div>
-                    )}
-                </div>
+                        )}
+                    </div>
+                </SmoothScroll>
                 <div className="flex gap-2 p-1 bg-muted/30 rounded-2xl border">
                     <Input
                         value={input}
