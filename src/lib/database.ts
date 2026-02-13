@@ -15,7 +15,7 @@ function getTableName(category: string): string {
   if (cat.includes('видеокарт') || cat === 'gpu') return 'products_gpu';
 
   // Материнские платы
-  if (cat.includes('плата') || cat === 'motherboard') return 'products_motherboard';
+  if (cat.includes('плат') || cat.includes('motherboard') || cat === 'mb') return 'products_motherboard';
 
   // Оперативная память
   if (cat.includes('память') || cat.includes('ram')) return 'products_ram';
@@ -24,7 +24,7 @@ function getTableName(category: string): string {
   if (cat.includes('накопител') || cat.includes('ssd') || cat.includes('hdd') || cat === 'storage') return 'products_ssd';
 
   // Блоки питания
-  if (cat.includes('блок питания') || cat.includes('psu')) return 'products_psu';
+  if (cat.includes('блок') || cat.includes('питания') || cat.includes('psu')) return 'products_psu';
 
   // Корпуса
   if (cat.includes('корпус') || cat === 'case') return 'products_case';
@@ -51,6 +51,14 @@ export async function saveProducts(products: Product[], category: string): Promi
       };
     });
 
+    // Дедупликация перед сохранением (чтобы избежать ошибки "ON CONFLICT DO UPDATE command cannot affect row a second time")
+    // Если в одной пачке пришло несколько товаров с одинаковым link+store, оставляем только первый
+    const uniqueProducts = productsToInsert.filter((product, index, self) =>
+      index === self.findIndex((p) => (
+        p.link === product.link && p.store === product.store
+      ))
+    );
+
     // Используем upsert для обновления существующих продуктов
     // Пытаемся использовать админ-клиент для обхода RLS
     let supabase = getAdminSupabaseClient();
@@ -65,7 +73,7 @@ export async function saveProducts(products: Product[], category: string): Promi
     }
     const { error } = await supabase
       .from(tableName as any)
-      .upsert(productsToInsert, {
+      .upsert(uniqueProducts, {
         onConflict: 'link,store',
         ignoreDuplicates: false
       });
@@ -168,12 +176,21 @@ export async function searchProducts(query: string, store?: string, category?: s
       return { products: [], error: 'Supabase client not initialized' };
     }
 
+    const words = query.split(/\s+/).filter(w => w.length > 0);
     const tableName = getTableName(category || query);
+
     let supabaseQuery = supabase
       .from(tableName as any)
-      .select('*')
-      .ilike('title', `%${query}%`)
-      .limit(100);
+      .select('*');
+
+    // If we have multiple words, we want to match as many as possible
+    // For now, let's stick to matching all words (AND) for precision
+    // but using separate .ilike calls for each word
+    words.forEach(word => {
+      supabaseQuery = supabaseQuery.ilike('title', `%${word}%`);
+    });
+
+    supabaseQuery = supabaseQuery.limit(100);
 
     if (store) {
       supabaseQuery = supabaseQuery.eq('store', store);
@@ -187,7 +204,9 @@ export async function searchProducts(query: string, store?: string, category?: s
     const parsePrice = (priceStr: any): number => {
       if (typeof priceStr === 'number') return priceStr;
       if (!priceStr) return 0;
-      return parseFloat(String(priceStr).replace(/[^\d.,-]/g, '').replace(',', '.'));
+      // Remove whitespace, currency symbols and handle both , and .
+      const cleaned = String(priceStr).replace(/\s/g, '').replace(/[^\d.,-]/g, '').replace(',', '.');
+      return parseFloat(cleaned) || 0;
     };
 
     if (maxPrice) {
@@ -195,6 +214,8 @@ export async function searchProducts(query: string, store?: string, category?: s
     }
 
     // Сортируем: сначала те, что дешевле
+    results.sort((a, b) => parsePrice(a.price) - parsePrice(b.price));
+
     return { products: results };
   } catch (error) {
     console.error('Ошибка в searchProducts:', error);

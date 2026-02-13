@@ -11,6 +11,14 @@ export async function POST(request: NextRequest) {
 
         console.log(`[Admin] Запущена генерация (${mode}, ${count} шт.) для: ${category}`);
 
+        // Если режим 'prices', получаем список товаров для обновления
+        let existingToUpdate: any[] = [];
+        if (mode === 'prices') {
+            const { products: existing } = await getProductsByQuery(category);
+            existingToUpdate = existing.slice(0, count); // Берем только нужное количество
+            console.log(`[Admin] Найдено ${existingToUpdate.length} товаров для обновления цен.`);
+        }
+
         // Если режим 'full', получаем список уже существующих товаров для исключения дубликатов
         let excludeTitles: string[] = [];
         if (mode === 'full') {
@@ -20,7 +28,7 @@ export async function POST(request: NextRequest) {
         }
 
         // 1. Генерируем данные через ИИ с учетом режима, количества и исключений
-        const products = await generateHardwareData(category, mode as 'full' | 'prices', count, excludeTitles);
+        const products = await generateHardwareData(category, mode as 'full' | 'prices', count, excludeTitles, existingToUpdate);
 
         if (!products || products.length === 0) {
             return NextResponse.json({

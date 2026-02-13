@@ -16,9 +16,9 @@ export const SmoothScroll = ({ children, root = true, className = "" }: SmoothSc
             <ReactLenis
                 root
                 options={{
-                    lerp: 0.18,
-                    duration: 0.72,
-                    wheelMultiplier: 0.8,
+                    lerp: 0.12,
+                    duration: 1.2,
+                    wheelMultiplier: 1,
                     smoothWheel: true,
                 }}
             >
@@ -28,11 +28,20 @@ export const SmoothScroll = ({ children, root = true, className = "" }: SmoothSc
     }
 
     return (
-        <div
-            className={`flex-1 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent ${className}`}
-            data-lenis-prevent="true"
+        <ReactLenis
+            root={false}
+            options={{
+                lerp: 0.1,
+                duration: 1.2,
+                smoothWheel: true,
+                syncTouch: true,
+            }}
+            className={`flex-1 overflow-y-auto overflow-x-hidden ${className}`}
+            data-lenis-prevent
         >
-            {children}
-        </div>
+            <div className="min-h-full w-full">
+                {children}
+            </div>
+        </ReactLenis>
     );
 };

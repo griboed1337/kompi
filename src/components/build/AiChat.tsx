@@ -8,6 +8,7 @@ import { QUICK_QUESTIONS, ChatMessage, ChatContext } from "@/lib/ai-types";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { SmoothScroll } from "@/components/SmoothScroll";
+import { useLenis } from "lenis/react";
 
 interface AiChatProps {
     context?: ChatContext;
@@ -19,6 +20,27 @@ export function AiChat({ context }: AiChatProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [mode, setMode] = useState<'beginner' | 'advanced'>(context?.experience === 'advanced' ? 'advanced' : 'beginner');
+
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+    const lenis = useLenis();
+
+    // Авто-скролл вниз при новых сообщениях
+    useEffect(() => {
+        if (messages.length > 0) {
+            // Даем время на рендер
+            setTimeout(() => {
+                const scrollContainer = messagesEndRef.current?.parentElement;
+                if (scrollContainer) {
+                    // Если используется Lenis внутри SmoothScroll, он перехватывает скролл
+                    // Но мы можем попробовать стандартный scrollTo или найти инстанс
+                    scrollContainer.scrollTo({
+                        top: scrollContainer.scrollHeight,
+                        behavior: 'smooth'
+                    });
+                }
+            }, 100);
+        }
+    }, [messages, isLoading]);
 
     // Синхронизация режима с внешним контекстом, если он изменился
     useEffect(() => {
@@ -197,6 +219,7 @@ export function AiChat({ context }: AiChatProps) {
                                 {error}
                             </div>
                         )}
+                        <div ref={messagesEndRef} />
                     </div>
                 </SmoothScroll>
                 <div className="flex gap-2 p-1 bg-muted/30 rounded-2xl border">
