@@ -1,0 +1,15 @@
+[dotenv@17.2.3] injecting env (6) from .env.local -- tip: ЁЯФР prevent building .env in docker: https://dotenvx.com/prebuild
+Starting update for category: CPU
+[LOG] About to fetch: https://www.dns-shop.ru/product/d94bad20176fed20/processor-amd-ryzen-5-5600x-oem/
+Starting parseProduct for: https://www.dns-shop.ru/product/d94bad20176fed20/processor-amd-ryzen-5-5600x-oem/
+Warming up session at dns-shop.ru...
+Waiting for DNS cookies (qrator_jsid)...
+DNS: cookies qrator_jsid/qrator_jsid2 did not appear.
+Navigating to product URL: https://www.dns-shop.ru/product/d94bad20176fed20/processor-amd-ryzen-5-5600x-oem/?cityPath=msk
+Error during page processing: Error: Failed to load page: 401
+    at Function.parseProduct (C:\Users\admin\Documents\kompi\kompi1\src\lib\services\dns.ts:66:23)
+    at async updateProducts (C:\Users\admin\Documents\kompi\kompi1\scripts\update-dns-products.ts:20:33)
+Error processing https://www.dns-shop.ru/product/d94bad20176fed20/processor-amd-ryzen-5-5600x-oem/: Error: Failed to load page: 401
+    at Function.parseProduct (C:\Users\admin\Documents\kompi\kompi1\src\lib\services\dns.ts:66:23)
+    at async updateProducts (C:\Users\admin\Documents\kompi\kompi1\scripts\update-dns-products.ts:20:33)
+Update finished

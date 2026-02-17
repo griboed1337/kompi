@@ -1,0 +1,15 @@
+[dotenv@17.2.3] injecting env (6) from .env.local -- tip: тЪЩя╕П  load multiple .env files with { path: ['.env.local', '.env'] }
+Starting update for category: CPU
+[LOG] About to fetch: https://www.dns-shop.ru/product/d94bad20176fed20/processor-amd-ryzen-5-5600x-oem/
+Starting parseProduct for: https://www.dns-shop.ru/product/d94bad20176fed20/processor-amd-ryzen-5-5600x-oem/
+Warming up session at dns-shop.ru...
+Waiting for DNS cookies... (up to 60s)
+DNS: cookies did not appear within deadline.
+Post-cookie settled wait...
+Error during page processing: page.waitForTimeout: Target page, context or browser has been closed
+    at Function.parseProduct (C:\Users\admin\Documents\kompi\kompi1\src\lib\services\dns.ts:57:24)
+    at async updateProducts (C:\Users\admin\Documents\kompi\kompi1\scripts\update-dns-products.ts:20:33)
+Error processing https://www.dns-shop.ru/product/d94bad20176fed20/processor-amd-ryzen-5-5600x-oem/: page.waitForTimeout: Target page, context or browser has been closed
+    at Function.parseProduct (C:\Users\admin\Documents\kompi\kompi1\src\lib\services\dns.ts:57:24)
+    at async updateProducts (C:\Users\admin\Documents\kompi\kompi1\scripts\update-dns-products.ts:20:33)
+Update finished

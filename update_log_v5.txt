@@ -1,0 +1,16 @@
+[dotenv@17.2.3] injecting env (6) from .env.local -- tip: ЁЯЧВя╕П backup and recover secrets: https://dotenvx.com/ops
+Starting update for category: CPU
+[LOG] About to fetch: https://www.dns-shop.ru/product/d94bad20176fed20/processor-amd-ryzen-5-5600x-oem/
+[Safe Parsing] Starting for: https://www.dns-shop.ru/product/d94bad20176fed20/processor-amd-ryzen-5-5600x-oem/
+[Safe Parsing] Warming up session at dns-shop.ru...
+[Safe Parsing] Waiting for Qrator challenge...
+[Safe Parsing] Warning: qrator_jsid cookie not detected after warmup.
+[Safe Parsing] Navigating to: https://www.dns-shop.ru/product/d94bad20176fed20/processor-amd-ryzen-5-5600x-oem/?cityPath=msk
+[Safe Parsing] Page load failed with status: 401
+[Safe Parsing] Error: Error: Failed to load page: 401
+    at Function.parseProduct (C:\Users\admin\Documents\kompi\kompi1\src\lib\services\dns.ts:89:23)
+    at async updateProducts (C:\Users\admin\Documents\kompi\kompi1\scripts\update-dns-products.ts:20:33)
+Error processing https://www.dns-shop.ru/product/d94bad20176fed20/processor-amd-ryzen-5-5600x-oem/: Error: Failed to load page: 401
+    at Function.parseProduct (C:\Users\admin\Documents\kompi\kompi1\src\lib\services\dns.ts:89:23)
+    at async updateProducts (C:\Users\admin\Documents\kompi\kompi1\scripts\update-dns-products.ts:20:33)
+Update finished

@@ -20,6 +20,7 @@ export default function AdminPage() {
     const router = useRouter();
     const isAdmin = user?.email === 'olegshattskov1207@gmail.com';
     const [isParsing, setIsParsing] = useState(false);
+    const [isDnsParsing, setIsDnsParsing] = useState(false);
     const [itemCount, setItemCount] = useState(15);
     const [selectedCategory, setSelectedCategory] = useState("процессоры");
     const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
@@ -70,6 +71,46 @@ export default function AdminPage() {
             return false;
         } finally {
             setIsParsing(false);
+        }
+    };
+
+    const handleDnsParsing = async () => {
+        setIsDnsParsing(true);
+        setStatusMessage(null);
+        try {
+            const response = await fetch('/api/admin/dns-parse', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ category: selectedCategory, count: itemCount })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                setStatusMessage({
+                    type: 'success',
+                    text: data.message
+                });
+                setLastActions(prev => [
+                    {
+                        id: Date.now(),
+                        type: 'system',
+                        text: `DNS: Спарсено ${data.count} товаров для "${selectedCategory}"`,
+                        time: 'только что'
+                    },
+                    ...prev
+                ]);
+            } else {
+                throw new Error(data.error || 'Ошибка при парсинге DNS');
+            }
+        } catch (error) {
+            console.error('DNS Parsing error:', error);
+            setStatusMessage({
+                type: 'error',
+                text: error instanceof Error ? error.message : 'Не удалось выполнить парсинг DNS'
+            });
+        } finally {
+            setIsDnsParsing(false);
         }
     };
 
@@ -206,6 +247,37 @@ export default function AdminPage() {
                         >
                             <RefreshCcw className={`h-3 w-3 mr-1 ${isParsing ? 'animate-spin' : ''}`} />
                             Запустить полную проверку всех типов
+                        </Button>
+                    </CardContent>
+                </Card>
+
+                {/* Парсинг DNS-shop */}
+                <Card className="border-none shadow-xl bg-card/50 backdrop-blur-md overflow-hidden ring-1 ring-border/50">
+                    <div className="h-1.5 w-full bg-gradient-to-r from-blue-600 to-cyan-400" />
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-blue-600">
+                            <div className="bg-blue-600 text-white text-[10px] px-1.5 py-0.5 rounded font-black uppercase tracking-wider">DNS</div>
+                            Парсинг каталога
+                        </CardTitle>
+                        <CardDescription>
+                            Получить реальные данные и цены напрямую из DNS-shop
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="p-3 rounded-xl bg-blue-500/5 border border-blue-500/10 text-xs text-blue-700/80 mb-2 leading-relaxed">
+                            Используется механизм <strong>Safe Parsing</strong> для обхода Qrator Labs и извлечения спецификаций.
+                        </div>
+                        <Button
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-6 h-auto gap-2 shadow-lg shadow-blue-500/20 transition-all active:scale-[0.98]"
+                            onClick={handleDnsParsing}
+                            disabled={isDnsParsing || isParsing}
+                        >
+                            {isDnsParsing ? (
+                                <RefreshCcw className="h-5 w-5 animate-spin" />
+                            ) : (
+                                <Database className="h-5 w-5" />
+                            )}
+                            <span>{isDnsParsing ? 'Парсинг...' : 'Запустить парсинг DNS'}</span>
                         </Button>
                     </CardContent>
                 </Card>

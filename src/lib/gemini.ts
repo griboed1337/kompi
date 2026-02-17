@@ -2,10 +2,63 @@ import { createGeminiProvider } from 'ai-sdk-provider-gemini-cli';
 import { generateText } from 'ai';
 import { ChatMessage, ChatContext } from './ai-types';
 
+const NORMALIZE_HARDWARE_PROMPT = `Ты — эксперт по нормализации данных о ПК комплектующих.
+Твоя задача: взять сырые данные из DNS-shop и привести их к унифицированному формату.
+
+ПРАВИЛА ИМЕНОВАНИЯ:
+1. Используй унифицированный формат: [Бренд] [Серия/Линейка] [Модель] [Главная характеристика].
+2. ДЛЯ ПРОЦЕССОРОВ: Только OEM версия. Не добавляй "OEM" в название, если модель уникальна.
+3. Убери из названия лишние слова: "Процессор", "Видеокарта", мусорные символы.
+
+ВХОДНЫЕ ДАННЫЕ (JSON):
+{raw_data}
+
+ОТВЕТЬ ТОЛЬКО В ФОРМАТЕ JSON (Product):
+{
+  "title": "Унифицированное название",
+  "price": 12345,
+  "original_price": 14000,
+  "link": "оригинальная ссылка",
+  "image": "ссылка на картинку",
+  "availability": "В наличии",
+  "store": "DNS",
+  "specs": {
+    "ключ": "значение"
+  }
+}
+Отвечай строго JSON без пояснений.`;
+
 // Инициализируем провайдер Gemini через CLI с OAuth
 const geminiProvider = createGeminiProvider({
     authType: 'oauth-personal',
 });
+
+// ... (existing code: SYSTEM_PROMPT, HARDWARE_FULL_PROMPT, etc.)
+
+export async function normalizeHardwareData(
+    rawData: any,
+    category: string
+): Promise<any> {
+    try {
+        const prompt = NORMALIZE_HARDWARE_PROMPT.replace('{raw_data}', JSON.stringify(rawData, null, 2));
+
+        const { text } = await generateText({
+            model: geminiProvider('gemini-1.5-flash-latest'), // Используем стабильную модель
+            system: `Ты нормализуешь данные для категории ${category}`,
+            messages: [{ role: 'user', content: prompt }],
+            temperature: 0.1, // Минимум креативности
+        });
+
+        if (!text) throw new Error('Пустой ответ от AI');
+
+        const cleanJson = text.replace(/```json\n?|\n?```/g, '').trim();
+        return JSON.parse(cleanJson);
+    } catch (error) {
+        console.error('Ошибка при нормализации данных:', error);
+        // В случае ошибки возвращаем оригинал, если он есть
+        return rawData;
+    }
+}
 
 // Системный промпт для AI-ассистента по сборке ПК
 // Системный промпт для ассистента

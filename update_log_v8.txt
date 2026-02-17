@@ -1,0 +1,25 @@
+[dotenv@17.2.3] injecting env (6) from .env.local -- tip: тЪЩя╕П  override existing env vars with { override: true }
+Starting update for category: CPU from catalog: https://www.dns-shop.ru/catalog/17a899cd16404e77/processory/
+[Safe Parsing] Fetching URLs from catalog: https://www.dns-shop.ru/catalog/17a899cd16404e77/processory/
+Found 2 live URLs to process.
+[LOG] About to fetch: https://www.dns-shop.ru/product/3ecad0b7a46fed20/processor-amd-ryzen-7-7800x3d-oem/
+[Safe Parsing] Starting for: https://www.dns-shop.ru/product/3ecad0b7a46fed20/processor-amd-ryzen-7-7800x3d-oem/
+[Safe Parsing] Warming up session at dns-shop.ru...
+[Safe Parsing] Qrator session established.
+[Safe Parsing] Navigating to: https://www.dns-shop.ru/product/3ecad0b7a46fed20/processor-amd-ryzen-7-7800x3d-oem/
+[Safe Parsing] HTML loaded, length: 162423
+[Safe Parsing] Parsed title: "╨Я╤А╨╛╤Ж╨╡╤Б╤Б╨╛╤А AMD Ryzen 7 7800X3D OEM"
+[LOG] Successfully parsed product: ╨Я╤А╨╛╤Ж╨╡╤Б╤Б╨╛╤А AMD Ryzen 7 7800X3D OEM
+[LOG] About to save product to products_cpu
+Successfully saved ╨Я╤А╨╛╤Ж╨╡╤Б╤Б╨╛╤А AMD Ryzen 7 7800X3D OEM
+[LOG] About to fetch: https://www.dns-shop.ru/product/3ecad0b7a46fed20/processor-amd-ryzen-7-7800x3d-oem/?opinion
+[Safe Parsing] Starting for: https://www.dns-shop.ru/product/3ecad0b7a46fed20/processor-amd-ryzen-7-7800x3d-oem/?opinion
+[Safe Parsing] Warming up session at dns-shop.ru...
+[Safe Parsing] Qrator session established.
+[Safe Parsing] Navigating to: https://www.dns-shop.ru/product/3ecad0b7a46fed20/processor-amd-ryzen-7-7800x3d-oem/?opinion
+[Safe Parsing] HTML loaded, length: 301488
+[Safe Parsing] Parsed title: "╨Я╤А╨╛╤Ж╨╡╤Б╤Б╨╛╤А AMD Ryzen 7 7800X3D OEM"
+[LOG] Successfully parsed product: ╨Я╤А╨╛╤Ж╨╡╤Б╤Б╨╛╤А AMD Ryzen 7 7800X3D OEM
+[LOG] About to save product to products_cpu
+Successfully saved ╨Я╤А╨╛╤Ж╨╡╤Б╤Б╨╛╤А AMD Ryzen 7 7800X3D OEM
+Update finished
